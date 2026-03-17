@@ -1,0 +1,478 @@
+## BOOSTING METHODS
+
+===============================================================
+1. INTRODUCTION TO BOOSTING
+===============================================================
+
+Boosting is an ensemble learning technique that:
+
+* Combines multiple weak learners
+* Builds models sequentially
+* Each new model corrects errors made by previous models
+* Final prediction = weighted sum of all weak learners
+
+Weak Learner:
+
+* A model slightly better than random guessing
+* Usually shallow Decision Trees (stumps)
+
+Core Idea:
+Focus more on difficult or misclassified data points over time.
+
+Boosting vs Bagging:
+Bagging:
+
+* Parallel training
+* Reduces variance
+* Example: Random Forest
+
+Boosting:
+
+* Sequential training
+* Reduces bias
+* Focuses on errors
+* Example: AdaBoost, Gradient Boosting, XGBoost, LightGBM
+
+Why Boosting Works:
+
+* Converts weak learners into strong learner
+* Minimizes loss function step-by-step
+
+
+============================================================
+2. TYPES OF BOOSTING METHODS
+============================================================
+
+Main Boosting Methods:
+
+1. AdaBoost (Adaptive Boosting)
+2. Gradient Boosting
+3. XGBoost (Extreme Gradient Boosting)
+4. LightGBM (Light Gradient Boosting Machine)
+5. CatBoost (Not covered in detail here)
+
+Key Differences:
+
+AdaBoost:
+
+* Adjusts sample weights
+* Uses exponential loss
+
+Gradient Boosting:
+
+* Uses gradient descent
+* Minimizes differentiable loss
+
+XGBoost:
+
+* Regularized Gradient Boosting
+* Highly optimized
+
+LightGBM:
+
+* Faster than XGBoost
+* Uses leaf-wise tree growth
+
+
+============================================================
+3. ADABOOST
+============================================================
+
+Full Form:
+Adaptive Boosting
+
+Main Idea:
+
+* Train weak learner
+* Increase weight of misclassified samples
+* Train next learner on reweighted data
+* Combine with weighted voting
+
+Algorithm Steps:
+
+Step 1:
+Initialize equal weights for all samples
+
+Step 2:
+Train weak learner (Decision Stump)
+
+Step 3:
+Compute error:
+
+Error = sum(weights of misclassified samples)
+
+Step 4:
+Compute model weight:
+
+Alpha = 0.5 * ln((1 - error) / error)
+
+Step 5:
+Update sample weights:
+
+If misclassified → increase weight
+If correctly classified → decrease weight
+
+Step 6:
+Normalize weights
+
+Step 7:
+Repeat for N estimators
+
+Final Prediction:
+Weighted majority vote
+
+
+AdaBoost Edge Cases:
+
+1. Error = 0
+   Alpha becomes infinite
+   Solution: Stop training early
+
+2. Error >= 0.5
+   Model worse than random
+   Solution: Discard that weak learner
+
+3. Noisy data
+   AdaBoost heavily focuses on outliers
+   Can overfit noisy datasets
+
+
+Titanic Example:
+
+Weak learner 1:
+Predicts based only on Sex
+
+Weak learner 2:
+Focuses more on males who were misclassified
+
+Weak learner 3:
+Focuses on lower-class passengers
+
+Final output = weighted vote of all stumps
+
+
+Implementation:
+
+	from sklearn.ensemble import AdaBoostClassifier
+	from sklearn.tree import DecisionTreeClassifier
+
+	base = DecisionTreeClassifier(max_depth=1)
+
+	model = AdaBoostClassifier(
+	base_estimator=base,
+	n_estimators=100,
+	learning_rate=0.5
+	)
+
+	model.fit(X_train, y_train)
+
+
+============================================================
+4. GRADIENT BOOSTING – THEORY
+============================================================
+
+Core Idea:
+Boosting using gradient descent.
+
+Instead of reweighting samples,
+we fit new model to the residual errors.
+
+Steps:
+
+Step 1:
+Train initial model (usually mean prediction)
+
+Step 2:
+Compute residuals:
+Residual = Actual - Predicted
+
+Step 3:
+Train new model on residuals
+
+Step 4:
+Update prediction:
+
+New Prediction = Old Prediction + learning_rate × new_model
+
+Step 5:
+Repeat
+
+Mathematical View:
+Minimize loss function using gradient descent in function space.
+
+Loss Functions:
+
+* MSE (regression)
+* Log loss (classification)
+
+
+Edge Cases in Gradient Boosting:
+
+1. High learning rate
+   Can overshoot minimum → overfitting
+
+2. Too many trees
+   Overfitting
+
+3. Very small learning rate
+   Needs many trees → slow training
+
+4. Small dataset
+   Can overfit easily
+
+
+Implementation:
+
+	from sklearn.ensemble import GradientBoostingClassifier
+
+	model = GradientBoostingClassifier(
+	n_estimators=100,
+	learning_rate=0.1,
+	max_depth=3
+	)
+
+	model.fit(X_train, y_train)
+
+
+============================================================
+5. XGBOOST
+============================================================
+
+Full Form:
+Extreme Gradient Boosting
+
+Improvements over Gradient Boosting:
+
+* Regularization (L1 & L2)
+* Parallel processing
+* Tree pruning
+* Missing value handling
+* Faster computation
+
+Objective Function:
+
+Obj = Loss + Regularization
+
+Regularization:
+Prevents overfitting
+
+Tree Score Formula:
+Includes penalty for number of leaves
+
+
+Key Parameters:
+
+n_estimators
+max_depth
+learning_rate
+subsample
+colsample_bytree
+reg_alpha (L1)
+reg_lambda (L2)
+
+
+Edge Cases in XGBoost:
+
+1. Highly imbalanced data
+   Use scale_pos_weight
+
+2. Missing values
+   Automatically handled
+
+3. Too deep trees
+   Overfitting
+
+4. Large dataset
+   Memory optimization required
+
+
+Implementation:
+
+	import xgboost as xgb
+
+	model = xgb.XGBClassifier(
+	n_estimators=200,
+	max_depth=4,
+	learning_rate=0.05,
+	subsample=0.8,
+	colsample_bytree=0.8
+	)
+
+model.fit(X_train, y_train)
+
+
+============================================================
+6. LIGHTGBM (LGBM)
+============================================================
+
+Full Form:
+Light Gradient Boosting Machine
+
+Developed by Microsoft
+
+Key Innovation:
+Leaf-wise tree growth (instead of level-wise)
+
+Level-wise:
+Used in XGBoost
+Grows all nodes at same depth
+
+Leaf-wise:
+Splits leaf with highest loss reduction
+Faster convergence
+
+
+Advantages:
+
+* Faster than XGBoost
+* Lower memory usage
+* Handles large datasets
+
+
+Important Concepts:
+
+1. GOSS (Gradient-based One Side Sampling)
+   Selects important samples
+
+2. EFB (Exclusive Feature Bundling)
+   Reduces feature dimension
+
+
+Edge Cases:
+
+1. Small dataset
+   May overfit easily
+
+2. Very deep trees
+   Leaf-wise growth increases overfitting risk
+
+3. Imbalanced dataset
+   Use is_unbalance=True
+
+
+Implementation:
+
+	import lightgbm as lgb
+
+	model = lgb.LGBMClassifier(
+	n_estimators=200,
+	learning_rate=0.05,
+	max_depth=-1,
+	num_leaves=31
+	)
+
+	model.fit(X_train, y_train)
+
+
+============================================================
+7. COMPARISON OF BOOSTING METHODS
+============================================================
+
+AdaBoost:
+
+* Simple
+* Sensitive to noise
+* Best for clean datasets
+
+Gradient Boosting:
+
+* More flexible
+* Works for regression & classification
+
+XGBoost:
+
+* Highly optimized
+* Regularized
+* Industry standard
+
+LightGBM:
+
+* Faster than XGBoost
+* Better for large datasets
+
+
+============================================================
+8. TITANIC DATASET – COMPLETE BOOSTING PIPELINE
+============================================================
+
+Steps:
+
+1. Data Cleaning
+
+* Fill missing Age
+* Encode categorical features
+
+2. Train Boosting Model
+
+3. Tune hyperparameters
+
+4. Evaluate
+
+Example:
+
+	model = xgb.XGBClassifier(
+	n_estimators=300,
+	learning_rate=0.05,
+	max_depth=3
+	)
+
+	model.fit(X_train, y_train)
+
+Accuracy on Titanic typically:
+
+* AdaBoost: ~78%
+* Gradient Boosting: ~82%
+* XGBoost: ~84%
+* LightGBM: ~85%
+
+
+============================================================
+9. IMPORTANT EDGE CASE SCENARIOS
+============================================================
+
+1. Noisy Data:
+   AdaBoost overfits quickly.
+
+2. Small Dataset:
+   Boosting can memorize.
+
+3. Highly Imbalanced:
+   Use class_weight or scale_pos_weight.
+
+4. Large Dataset:
+   LightGBM preferred.
+
+5. Missing Values:
+   XGBoost and LightGBM handle automatically.
+
+6. Categorical Variables:
+   LightGBM handles better than XGBoost.
+
+7. Overfitting:
+   Control with:
+
+* learning_rate
+* max_depth
+* subsample
+* regularization
+
+
+============================================================
+FINAL CONCLUSION
+============================================================
+
+Boosting is powerful because:
+
+* Sequential error correction
+* Converts weak learners to strong learner
+* Minimizes bias
+* Achieves high accuracy
+
+Modern Industry Preference:
+
+1. LightGBM
+2. XGBoost
+3. Gradient Boosting
+
+AdaBoost:
+Best for conceptual understanding.

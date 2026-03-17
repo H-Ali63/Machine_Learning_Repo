@@ -1,0 +1,425 @@
+# DBSCAN (Density-Based Spatial Clustering of Applications with Noise)
+======================================================================
+
+# 1. Introduction to DBSCAN
+---------------------------
+DBSCAN (Density-Based Spatial Clustering of Applications with Noise) is an 
+unsupervised clustering algorithm that groups together points that are 
+closely packed and marks points in low-density regions as outliers (noise).
+
+Unlike K-Means, DBSCAN does not require specifying the number of clusters beforehand.
+
+### Key Idea
+------------
+Clusters are formed based on density of points rather than distance to centroids.
+
+DBSCAN works well when:
+
+* Clusters are irregularly shaped
+* Dataset contains noise/outliers
+
+
+# 2. Important Terminology
+--------------------------
+## 1 Core Point
+
+A point is a core point if it has at least MinPts points within distance ε (epsilon).
+
+## 2 Border Point
+
+A point that is within ε distance of a core point, but does not have enough 
+neighbors to become a core point itself.
+
+## 3 Noise Point (Outlier)
+
+Points that are not reachable from any core point.
+
+
+# 3 DBSCAN Hyperparameters
+--------------------------
+DBSCAN uses two important hyperparameters.
+
+### 1 Epsilon (ε)
+
+Maximum distance between two points to be considered neighbors.
+
+### 2 MinPts
+
+Minimum number of points required inside ε distance to form a cluster.
+
+Typical rule:
+-------------
+MinPts ≥ dimension + 1
+
+Example:
+
+For 2D data → MinPts ≥ 3
+
+
+# 4 Mathematical Concept
+
+Distance between two points is usually calculated using Euclidean Distance.
+
+If:
+
+distance ≤ ε → points are neighbors.
+
+
+# 5 DBSCAN Algorithm Step-by-Step
+
+Step 1
+Pick a random point.
+
+Step 2
+Find all points within ε distance.
+
+Step 3
+
+If number of neighbors ≥ MinPts
+
+→ create new cluster.
+
+Else
+
+→ mark as noise
+
+Step 4
+
+Expand cluster by recursively checking neighbors.
+
+Step 5
+
+Repeat until all points are processed.
+
+
+# 6 Example Dataset
+-------------------
+we have the following 2D points.
+
+| Point | X  | Y  |
+| ----- | -- | -- |
+| A     | 1  | 2  |
+| B     | 2  | 2  |
+| C     | 2  | 3  |
+| D     | 8  | 7  |
+| E     | 8  | 8  |
+| F     | 25 | 80 |
+
+Assume:
+
+ε = 2
+MinPts = 2
+
+
+### Step 1
+
+Check point A.
+
+Neighbors inside ε:
+
+A, B, C
+
+Since neighbors ≥ MinPts → Core point
+
+Cluster 1 created.
+
+Cluster 1:
+
+A
+B
+C
+
+
+### Step 2
+
+Check point D.
+
+Neighbors:
+
+D, E
+
+Cluster 2 created.
+
+Cluster 2:
+
+D
+E
+
+
+### Step 3
+
+Point F
+
+No nearby neighbors.
+
+Marked as Noise (Outlier).
+
+
+### Final Clusters
+
+Cluster 1 → A, B, C
+Cluster 2 → D, E
+Noise → F
+
+
+# 7 DBSCAN vs K-Means
+---------------------
+| Feature              | DBSCAN    | K-Means   |
+| -------------------- | --------- | --------- |
+| Cluster Shape        | Any shape | Spherical |
+| Need K value         | No        | Yes       |
+| Handles Outliers     | Yes       | No        |
+| Performance          | Slower    | Faster    |
+| Density-based        | Yes       | No        |
+| Sensitive to scaling | Yes       | Yes       |
+
+
+# Example Visualization
+
+K-Means struggles with non-circular clusters.
+
+DBSCAN handles them easily.
+
+Example:
+
+Two moon-shaped clusters.
+
+K-Means fails
+DBSCAN works perfectly.
+
+
+# 8 Hyperparameter Tuning Methods
+---------------------------------
+Choosing good ε and MinPts is important.
+
+
+## Method 1: k-distance graph
+
+Steps:
+
+1 Plot distance to kth nearest neighbor
+2 Sort distances
+3 Look for elbow point
+
+Elbow value ≈ ε
+
+Example Python code:
+
+from sklearn.neighbors import NearestNeighbors
+import numpy as np
+import matplotlib.pyplot as plt
+
+neighbors = NearestNeighbors(n_neighbors=4)
+neighbors_fit = neighbors.fit(X)
+
+distances, indices = neighbors_fit.kneighbors(X)
+
+distances = np.sort(distances[:,3])
+
+plt.plot(distances)
+plt.title("K-distance graph")
+plt.show()
+
+
+Elbow point gives optimal epsilon.
+
+
+## Method 2: Grid Search
+
+Test multiple values of:
+
+ε
+MinPts
+
+Evaluate using clustering quality.
+
+
+## Method 3: Domain Knowledge
+
+If dataset is known:
+
+Example:
+
+* GPS data
+* Customer location
+* Image pixels
+
+Use domain-specific distance thresholds.
+
+
+# 9 DBSCAN Implementation (Python)
+----------------------------------
+Example dataset:
+
+from sklearn.cluster import DBSCAN
+import numpy as np
+import matplotlib.pyplot as plt
+
+X = np.array([
+[1,2],
+[2,2],
+[2,3],
+[8,7],
+[8,8],
+[25,80]
+])
+
+model = DBSCAN(eps=2, min_samples=2)
+
+model.fit(X)
+
+labels = model.labels_
+
+plt.scatter(X[:,0], X[:,1], c=labels)
+plt.show()
+
+
+Labels meaning:
+
+* 0 → Cluster 1
+* 1 → Cluster 2
+*-1 → Noise
+
+
+# 10 DBSCAN Capstone Project
+----------------------------
+## Project: Customer Location Clustering
+
+Goal:
+
+Identify customer groups and outliers based on geographical location.
+
+
+# Dataset Example
+
+Customer dataset:
+
+| CustomerID | Latitude | Longitude |
+| ---------- | -------- | --------- |
+| 1          | 19.07    | 72.87     |
+| 2          | 19.08    | 72.86     |
+| 3          | 19.06    | 72.88     |
+| 4          | 28.61    | 77.20     |
+| 5          | 28.60    | 77.21     |
+| 6          | 35.00    | 120.00    |
+
+Clusters represent cities or regions.
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import DBSCAN
+# Step 1 Import Libraries
+
+
+
+# Step 2 Load Dataset
+
+data = pd.read_csv("customers_location.csv")
+X = data[['Latitude','Longitude']]
+
+# Step 3 Apply DBSCAN
+
+model = DBSCAN(eps=0.05, min_samples=3)
+clusters = model.fit_predict(X)
+data['Cluster'] = clusters
+
+
+
+# Step 4 Visualize Clusters
+
+plt.scatter(data['Latitude'], data['Longitude'], c=data['Cluster'])
+plt.title("Customer Clusters")
+plt.show()
+
+
+
+# Step 5 Interpret Results
+
+Cluster 0 → City 1 customers
+Cluster 1 → City 2 customers
+Cluster -1 → Outliers
+
+Outliers may represent:
+
+* Fraud customers
+* Data errors
+* Remote users
+
+
+# 11 Edge Cases
+---------------
+### 1 Different Density Clusters
+
+DBSCAN struggles when clusters have different densities.
+
+Solution:
+
+Use HDBSCAN.
+
+
+### 2 High Dimensional Data
+
+Distance metrics become less effective.
+
+Solution:
+
+Use PCA before clustering.
+
+
+### 3 Large Dataset
+
+DBSCAN computational complexity increases.
+
+Solution:
+
+Use optimized libraries.
+
+
+# 12 Real-World Applications
+
+Fraud detection
+Anomaly detection
+GPS location clustering
+Astronomy (star cluster detection)
+Customer segmentation
+Image segmentation
+
+
+# 13 Advantages
+
+No need to specify K
+Handles outliers
+Works with arbitrary cluster shapes
+Good for spatial data
+
+
+# 14 Limitations
+
+Sensitive to ε parameter
+Fails with varying density clusters
+Slow for large datasets
+
+
+# 15 When to Use DBSCAN
+
+Use DBSCAN when:
+
+Clusters are irregular
+Dataset contains noise
+Number of clusters unknown
+
+
+Summary
+
+DBSCAN clusters data using density of points instead of centroids.
+
+Key parameters:
+
+ε → neighborhood distance
+MinPts → minimum points to form cluster
+
+Points are classified as:
+Core
+Border
+Noise

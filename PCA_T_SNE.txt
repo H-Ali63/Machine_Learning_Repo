@@ -1,0 +1,487 @@
+# Principal Component Analysis (PCA) and t-SNE
+=========================================================
+(Dimensionality Reduction Techniques in Machine Learning)
+=========================================================
+
+# 1. Introduction to PCA
+------------------------
+Principal Component Analysis (PCA) is a dimensionality reduction technique used to reduce the number of features in a dataset while preserving as much information as possible.
+
+It converts high-dimensional data → lower dimensional data.
+
+Example:
+
+Original dataset
+
+| Feature1 | Feature2 | Feature3 | Feature4 |
+| -------- | -------- | -------- | -------- |
+
+After PCA
+
+| PC1 | PC2 |
+
+Where:
+
+-> PC1 = First Principal Component
+-> PC2 = Second Principal Component
+
+These components are linear combinations of original features.
+
+
+# Why PCA is Needed
+-------------------
+High dimensional data causes problems like:
+
+1. Curse of dimensionality
+2. Slow model training
+3. Overfitting
+4. Hard to visualize
+
+Example:
+
+Dataset with 100 features → PCA reduces to 2 or 3 components.
+
+
+# 2. PCA Mathematical Idea
+--------------------------
+PCA finds directions (principal components) where the variance of data is maximum.
+
+These directions are orthogonal to each other.
+
+Variance formula:
+
+Where
+
+-> (Xi) = data point
+-> (μ) = mean
+-> (n) = number of observations
+
+PCA chooses directions where variance is maximum.
+
+
+# PCA Goal
+----------
+Transform dataset:
+
+[
+	X (n * d) -> Z (n * k)
+]
+
+Where
+
+-> (d) = original features
+-> (k) = reduced features
+-> (k < d)
+
+
+# 3. Steps of PCA Algorithm
+---------------------------
+Step 1
+Standardize the data
+
+Step 2
+Compute covariance matrix
+
+Step 3
+Compute eigenvalues and eigenvectors
+
+Step 4
+Sort eigenvalues
+
+Step 5
+Select top K eigenvectors
+
+Step 6
+Project data onto new feature space
+
+
+# 4. Manual Implementation of PCA
+----------------------------------
+Let’s understand PCA mathematically.
+
+Dataset:
+
+| X | Y |
+| - | - |
+| 2 | 3 |
+| 3 | 4 |
+| 4 | 5 |
+| 5 | 6 |
+
+
+# Step 1 Calculate Mean
+-----------------------
+Mean of X
+
+[
+μX = (2+3+4+5)/4 = 3.5
+]
+
+Mean of Y
+
+[
+μY = (3+4+5+6)/4 = 4.5
+]
+
+
+# Step 2 Standardize Dataset
+----------------------------
+Subtract mean.
+
+| X    | Y    |
+| ---- | ---- |
+| -1.5 | -1.5 |
+| -0.5 | -0.5 |
+| 0.5  | 0.5  |
+| 1.5  | 1.5  |
+
+
+# Step 3 Covariance Matrix
+---------------------------
+Covariance formula
+
+
+cov(X,Y) = ∑ (Xi - μX)(Yi-μY)
+           --------------------
+                  {n-1}
+
+	
+Covariance matrix:
+
+|   | X    | Y    |
+| - | ---- | ---- |
+| X | 1.67 | 1.67 |
+| Y | 1.67 | 1.67 |
+
+
+# Step 4 Eigenvalues and Eigenvectors
+-------------------------------------
+Eigenvalues determine importance of components.
+
+Higher eigenvalue → more information.
+
+Example:
+
+Eigenvalues
+
+
+λ1 = 3.34
+λ2 = 0
+
+
+Eigenvectors
+
+v1 = [0.707, 0.707]
+v2 = [-0.707, 0.707]
+
+
+PC1 represents maximum variance direction.
+
+# Step 5 Data Projection
+------------------------
+Project data onto PC1.
+
+New dataset becomes 1D instead of 2D.
+
+
+# 5. PCA Implementation Using 
+Example dataset: Wine dataset
+
+import numpy as np
+import pandas as pd
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+from sklearn.datasets import load_wine
+import matplotlib.pyplot as plt
+
+
+
+# Load Dataset
+
+data = load_wine()
+
+X = data.data
+y = data.target
+
+# Standardize Data
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+Standardization is important because PCA is variance based.
+
+# Apply PCA
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+# Check Explained Variance
+
+print(pca.explained_variance_ratio_)
+
+
+Example output
+
+
+[0.36, 0.19]
+
+
+Meaning
+
+PC1 → 36% information
+PC2 → 19% information
+
+Total retained
+
+55% variance
+
+
+# Visualize PCA
+
+plt.scatter(X_pca[:,0], X_pca[:,1], c=y)
+plt.xlabel("Principal Component 1")
+plt.ylabel("Principal Component 2")
+plt.title("PCA Visualization")
+plt.show()
+
+
+Result:
+
+3 wine classes become visually separable.
+
+
+# 6. Advantages of PCA
+----------------------
+Reduces dimensionality
+Removes correlated features
+Speeds up training
+Helps visualization
+
+
+# 7. Limitations of PCA
+------------------------
+Information loss
+Hard to interpret components
+Sensitive to scaling
+
+
+# 8. Introduction to t-SNE
+--------------------------
+t-SNE (t-Distributed Stochastic Neighbor Embedding) is a non-linear dimensionality reduction technique used for visualizing high-dimensional datasets.
+
+Developed by:
+
+Laurens van der Maaten (2008)
+
+Unlike PCA:
+
+PCA → linear transformation
+t-SNE → nonlinear transformation
+
+
+# Why t-SNE is Powerful
+
+t-SNE preserves local structure of data.
+
+It keeps similar points close together.
+
+Example:
+
+Handwritten digits dataset.
+
+Clusters appear clearly using t-SNE.
+
+
+# Key Idea of t-SNE
+
+t-SNE converts distance between points into probabilities.
+
+If two points are similar → high probability.
+
+Then it tries to maintain the same probability distribution in lower dimensions.
+
+
+# t-SNE Distance Similarity
+
+High dimensional similarity:
+
+Gaussian distribution
+
+Low dimensional similarity:
+
+Student-t distribution
+
+This prevents crowding problem.
+
+
+# Important Hyperparameters
+
+### 1 Perplexity
+
+Controls number of neighbors.
+
+Typical values:
+5 – 50
+
+### 2 Learning Rate
+
+Controls optimization speed.
+
+Typical values
+200 – 1000
+
+### 3 Iterations
+
+More iterations → better convergence.
+
+Example
+
+1000 iterations
+
+
+
+# 9 t-SNE Implementation
+------------------------
+Example using Digits Dataset.
+
+from sklearn.datasets import load_digits
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
+
+
+
+# Load Dataset
+
+digits = load_digits()
+
+X = digits.data
+y = digits.target
+
+
+
+# Apply t-SNE
+
+tsne = TSNE(n_components=2, perplexity=30, random_state=42)
+
+X_tsne = tsne.fit_transform(X)
+
+
+# Visualization
+
+plt.scatter(X_tsne[:,0], X_tsne[:,1], c=y)
+plt.title("t-SNE Visualization")
+plt.show()
+
+
+Result:
+
+Digits 0–9 form clear clusters.
+
+
+# 10 PCA vs t-SNE
+--------------------------------------------------------------
+| Feature                | PCA               | t-SNE         |
+| ---------------------- | ----------------- | ------------- |
+| Type                   | Linear            | Non-linear    |
+| Speed                  | Fast              | Slow          |
+| Interpretation         | Easy              | Hard          |
+| Use case               | Feature reduction | Visualization |
+| Handles nonlinear data | No                | Yes           |
+--------------------------------------------------------------
+
+# 11 PCA + t-SNE Combined
+-------------------------
+In real ML pipelines:
+
+Step 1 → PCA reduces dimension
+Step 2 → t-SNE visualization
+
+Example:
+
+
+1000 features → PCA → 50 features → t-SNE → 2D
+
+
+
+# Example Code
+
+pca = PCA(n_components=50)
+
+X_reduced = pca.fit_transform(X)
+
+tsne = TSNE(n_components=2)
+
+X_final = tsne.fit_transform(X_reduced)
+
+
+
+# 12 Edge Cases
+---------------
+### Small Dataset
+
+t-SNE works well.
+
+
+### Large Dataset
+
+t-SNE becomes very slow.
+
+Solution:
+
+Use: UMAP.
+
+
+### Feature Scaling
+
+PCA requires standardization
+
+
+### Random Initialization
+
+t-SNE results may vary.
+
+Use: random_state
+
+
+
+# 13 Real World Applications
+----------------------------
+Image compression
+Face recognition
+Genomics data analysis
+Customer segmentation
+Recommendation systems
+Anomaly detection
+
+
+# 14 Example Project
+--------------------
+Dataset: Customer purchase dataset
+
+Features:
+
+
+Age
+Income
+Spending score
+Products purchased
+
+Steps:
+
+1 Standardize dataset
+2 Apply PCA → reduce features
+3 Apply t-SNE → visualize clusters
+4 Identify customer segments
+
+
+# Final Summary
+---------------
+PCA
+
+-> Linear dimensionality reduction
+-> Maximizes variance
+-> Fast and scalable
+
+t-SNE
+
+-> Nonlinear dimensionality reduction
+-> Preserves local structure
+-> Best for visualization

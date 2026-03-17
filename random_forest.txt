@@ -1,0 +1,298 @@
+# 🌲 RANDOM FOREST
+
+
+🌳🌴🎄🎋🌳🎄🌴🎋🌳🌴🎄🎋🌳🎄🌴🎋🌳🌴🎄🎋🌳🎄🌴🎋🌳🌴🎄🎋🌳🎄🌴🎋🌳🌴🎄🎋🌳🎄🌴🎋
+
+
+## 1️. Introduction to Random Forest
+
+
+Random Forest is an *ensemble learning algorithm* used for:
+
+• Classification
+• Regression
+
+It works by building *multiple Decision Trees* and combining their results.
+
+Instead of relying on one tree (which may overfit), Random Forest:
+• Creates many trees
+• Trains them on random subsets of data
+• Takes majority vote (classification)
+• Takes average (regression)
+
+### Why "Random" Forest?
+
+Because randomness is introduced in two ways:
+
+1. Random sampling of training data (Bootstrap sampling)
+2. Random selection of features at each split
+
+This reduces overfitting and improves accuracy.
+
+
+### Advantages
+
+• Handles large datasets well
+• Reduces overfitting
+• Works with missing values
+• Good default algorithm
+
+
+### Disadvantages
+
+• Slower than a single decision tree
+• Less interpretable
+
+
+# 2️. Key Hyperparameters
+
+Hyperparameters control how the model learns.
+
+Important Random Forest Hyperparameters:
+
+1. n_estimators
+   → Number of trees in the forest
+   More trees = better performance (but slower)
+
+2. max_depth
+   → Maximum depth of each tree
+   Controls overfitting
+
+3. max_features
+   → Number of features to consider at each split
+   Default for classification = sqrt(total features)
+
+4. min_samples_split
+   → Minimum samples required to split a node
+
+5. min_samples_leaf
+   → Minimum samples required at a leaf node
+
+6. bootstrap
+   → Whether to use bootstrap sampling (True/False)
+
+
+# 3️. Number of Features and Estimators in Subset
+
+### n_estimators
+
+More trees:
+• Reduce variance
+• Improve stability
+• Increase computation time
+
+Typical values:
+100 – 500
+
+
+### max_features
+
+Determines how many features are considered at each split.
+
+Options:
+• sqrt → square root of total features (default for classification)
+• log2
+• None → use all features
+• Integer value
+
+Lower max_features:
+• More randomness
+• Less overfitting
+
+
+# 4️. Hyperparameter Tuning
+
+
+## Grid Search CV
+
+
+Grid Search tries:
+All possible combinations of hyperparameters.
+
+Example:
+n_estimators = [100, 200]
+max_depth = [5, 10]
+
+It will try all combinations.
+
+Advantage:
+• Best result guaranteed (within grid)
+
+Disadvantage:
+• Slow
+
+
+
+## Randomized Search CV
+
+
+Random Search:
+• Randomly samples combinations
+• Faster
+• Good for large search spaces
+
+
+# 5️. Practical Example: Titanic Dataset (Classification)
+
+We will predict:
+	Whether a passenger survived or not
+
+
+## Step 1: Import Libraries
+
+import pandas as pd
+import numpy as np
+
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import GridSearchCV
+
+
+## Step 2: Load Dataset
+
+You can load Titanic dataset from seaborn:
+
+import seaborn as sns
+df = sns.load_dataset('titanic')
+
+
+## Step 3: Data Preprocessing
+
+Select important features:
+
+df = df[['survived', 'pclass', 'sex', 'age', 'sibsp', 'parch', 'fare', 'embarked']]
+
+Handle missing values:
+
+df['age'].fillna(df['age'].median(), inplace=True)
+df['embarked'].fillna(df['embarked'].mode()[0], inplace=True)
+
+Convert categorical to numeric:
+
+df = pd.get_dummies(df, drop_first=True)
+
+
+## Step 4: Split Data
+
+X = df.drop('survived', axis=1)
+y = df['survived']
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+
+## Step 5: Train Random Forest Model
+
+rf = RandomForestClassifier(
+    n_estimators=100,
+    max_depth=None,
+    random_state=42
+)
+
+rf.fit(X_train, y_train)
+
+
+## Step 6: Make Predictions
+
+y_pred = rf.predict(X_test)
+
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+
+You should get accuracy around:
+	80% to 85%
+
+
+# 6️. Hyperparameter Tuning with Grid Search
+
+param_grid = {
+    'n_estimators': [100, 200],
+    'max_depth': [None, 5, 10],
+    'max_features': ['sqrt', 'log2']
+}
+
+grid = GridSearchCV(
+    RandomForestClassifier(random_state=42),
+    param_grid,
+    cv=5,
+    scoring='accuracy'
+)
+
+grid.fit(X_train, y_train)
+
+print("Best Parameters:", grid.best_params_)
+
+
+# 7️. Random Forest for Regression
+
+If predicting continuous value (example: predicting fare):
+
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
+
+X = df.drop('fare', axis=1)
+y = df['fare']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+rf_reg = RandomForestRegressor(n_estimators=100)
+rf_reg.fit(X_train, y_train)
+
+pred = rf_reg.predict(X_test)
+
+print("MSE:", mean_squared_error(y_test, pred))
+
+
+# 8️. Feature Importance
+
+Random Forest can show important features:
+
+import matplotlib.pyplot as plt
+
+importance = rf.feature_importances_
+
+plt.barh(X.columns, importance)
+plt.xlabel("Feature Importance")
+plt.show()
+
+This shows:
+Which features impact survival most.
+
+
+## 9. Project: Titanic Survival Prediction System
+
+Objective:
+Build a model to predict passenger survival.
+
+Steps:
+
+1. Data Cleaning
+2. Feature Engineering
+3. Model Training
+4. Hyperparameter Tuning
+5. Model Evaluation
+6. Feature Importance Analysis
+7. Save Model
+
+
+## Save Model
+
+import joblib
+joblib.dump(rf, "titanic_random_forest.pkl")
+
+
+## Load Model
+
+model = joblib.load("titanic_random_forest.pkl")
+
+
+# 11️. Summary
+
+Random Forest:
+• Ensemble of Decision Trees
+• Uses bootstrap sampling
+• Uses random feature selection
+• Works for classification and regression
+• Very powerful and widely used

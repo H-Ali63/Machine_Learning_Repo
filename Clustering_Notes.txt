@@ -1,0 +1,473 @@
+## CLUSTERING (UNSUPERVISED LEARNING)
+
+=============================
+1. INTRODUCTION TO CLUSTERING
+=============================
+Clustering is an unsupervised machine learning technique used to group similar data points together.
+
+Unlike supervised learning:
+
+* There are no labels
+* The algorithm discovers patterns automatically.
+
+Goal of clustering:
+
+Group data points so that:
+
+* Points in the same cluster are similar
+* Points in different clusters are dissimilar
+
+
+Example
+
+Customer segmentation.
+
+Customers with similar:
+
+* purchase behavior
+* income
+* spending patterns
+
+are grouped together.
+
+
+Real-world applications
+
+1 Customer segmentation
+2 Image compression
+3 Document clustering
+4 Market analysis
+5 Anomaly detection
+6 Recommendation systems
+
+
+Example Dataset
+
+Customer dataset:
+
+CustomerID | Age | Income | SpendingScore
+-----------------------------------------
+	1 	   | 25  | 30000  | 60
+	2 	   | 45  | 70000  | 30
+	3 	   | 35  | 50000  | 80
+
+Clustering groups these customers automatically.
+
+
+Types of Clustering Algorithms
+------------------------------
+1 K-Means Clustering
+2 Hierarchical Clustering
+3 DBSCAN
+4 Gaussian Mixture Models
+
+In this topic we focus on:
+
+• K-Means
+• Hierarchical clustering
+
+
+Edge Cases in Clustering
+
+1 No clear clusters in data
+2 Outliers affecting cluster center
+3 Wrong number of clusters
+4 High dimensional data
+
+
+=====================
+2. K-MEANS CLUSTERING
+=====================
+
+K-Means is the most widely used clustering algorithm.
+
+The idea:
+
+Divide dataset into K clusters where:
+
+K = number of clusters
+
+Each cluster has a centroid (center).
+
+
+Working of K-Means
+
+Step 1
+Choose number of clusters K.
+
+Step 2
+Randomly initialize K centroids.
+
+Step 3
+Assign each data point to the nearest centroid.
+
+Step 4
+Recalculate centroids using mean of cluster points.
+
+Step 5
+Repeat until centroids stop changing.
+
+
+Mathematical Idea
+
+Minimize within-cluster variance.
+
+Objective:
+
+Minimize sum of squared distances between data points and their centroid.
+
+
+Example
+
+Dataset:
+
+Age | Income
+------------
+25  | 30000
+30  | 35000
+45  | 80000
+50  | 85000
+
+K = 2
+
+Cluster 1 → low income
+Cluster 2 → high income
+
+
+Choosing the best K
+
+Use Elbow Method
+
+Steps:
+
+1 Run K-Means for multiple K values
+2 Compute WCSS (within-cluster sum of squares)
+3 Plot graph
+
+Optimal K = point where curve bends.
+
+
+==================================
+3. K-MEANS IMPLEMENTATION (PYTHON)
+==================================
+
+Step 1 Import Libraries
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+
+
+Step 2 Load Dataset
+
+Example dataset: Mall Customers
+
+df = pd.read_csv("Mall_Customers.csv")
+
+
+Dataset structure
+
+CustomerID | Age | AnnualIncome | SpendingScore
+
+
+Step 3 Select Features
+
+X = df[['Annual_Income(k$)','Spending_Score']]
+
+
+Step 4 Determine Optimal K
+
+wcss = []
+
+for i in range(1,11):
+	kmeans = KMeans(n_clusters=i)
+	kmeans.fit(X)
+	wcss.append(kmeans.inertia_)
+
+
+Step 5 Plot Elbow Graph
+
+plt.plot(range(1,11), wcss)
+plt.xlabel("Number of clusters")
+plt.ylabel("WCSS")
+plt.show()
+
+
+Step 6 Train K-Means Model
+
+kmeans = KMeans(n_clusters=5)
+
+y_kmeans = kmeans.fit_predict(X)
+
+
+Step 7 Visualize Clusters
+
+plt.scatter(X['AnnualIncome'], X['SpendingScore'], c=y_kmeans)
+
+plt.xlabel("Income")
+plt.ylabel("Spending Score")
+
+plt.show()
+
+
+===================================================
+4. K-MEANS CAPSTONE PROJECT – CUSTOMER SEGMENTATION
+===================================================
+
+Project Goal
+
+Segment mall customers based on:
+
+• Annual income
+• Spending score
+
+
+Dataset
+
+Mall Customers dataset
+
+Features:
+
+CustomerID
+Age
+Gender
+AnnualIncome
+SpendingScore
+
+
+Project Steps
+
+1 Load dataset
+2 Data cleaning
+3 Feature selection
+4 Determine optimal clusters
+5 Train K-Means
+6 Visualize clusters
+7 Interpret clusters
+
+
+Cluster Interpretation Example
+
+Cluster 1
+High income + high spending → premium customers
+
+Cluster 2
+Low income + low spending → budget customers
+
+Cluster 3
+High income + low spending → conservative spenders
+
+
+Business Impact
+
+Stores can target:
+
+• luxury products for premium customers
+• discounts for low spending customers
+
+
+==========================
+5. HIERARCHICAL CLUSTERING
+==========================
+
+Hierarchical clustering builds a tree of clusters.
+
+This tree structure is called a Dendrogram.
+
+
+Types of Hierarchical Clustering
+
+1 Agglomerative (Bottom-Up)
+
+Each point starts as its own cluster.
+
+Clusters merge step-by-step.
+
+2 Divisive (Top-Down)
+
+Start with one cluster.
+
+Split recursively.
+
+
+Agglomerative Algorithm
+
+Step 1
+Start with each data point as a cluster.
+
+Step 2
+Compute distance between clusters.
+
+Step 3
+Merge closest clusters.
+
+Step 4
+Repeat until one cluster remains.
+
+
+Distance Metrics
+
+Euclidean distance
+Manhattan distance
+Cosine distance
+
+
+Linkage Methods
+
+1 Single linkage
+Minimum distance
+
+2 Complete linkage
+Maximum distance
+
+3 Average linkage
+Average distance
+
+4 Ward linkage
+Minimizes variance
+
+
+=========================================
+6. HIERARCHICAL CLUSTERING IMPLEMENTATION
+=========================================
+
+Import Libraries
+
+from sklearn.cluster import AgglomerativeClustering
+import scipy.cluster.hierarchy as sch
+
+
+Step 1 Plot Dendrogram
+
+dendrogram = sch.dendrogram(
+sch.linkage(X, method='ward')
+)
+
+plt.title("Dendrogram")
+
+plt.show()
+
+
+Dendrogram Explanation
+
+The vertical line showing large distance indicates cluster separation.
+
+Cut the tree at that level to determine clusters.
+
+
+Step 2 Train Model
+
+hc = AgglomerativeClustering(
+n_clusters=5,
+metric='euclidean',
+linkage='ward'
+)
+
+y_hc = hc.fit_predict(X)
+
+
+Step 3 Visualization
+
+plt.scatter(
+X['AnnualIncome'],
+X['SpendingScore'],
+c=y_hc
+)
+
+plt.show()
+
+
+===========================================
+7. HIERARCHICAL CLUSTERING CAPSTONE PROJECT
+===========================================
+
+Project
+
+Customer segmentation using hierarchical clustering.
+
+
+Steps
+
+1 Load customer dataset
+2 Select features
+3 Plot dendrogram
+4 Identify cluster count
+5 Train model
+6 Visualize clusters
+
+
+Example Insights
+
+Cluster 1 → High spending young customers
+Cluster 2 → Low spending customers
+Cluster 3 → Medium income families
+
+
+=======================================
+8. COMPARISON – K-MEANS vs HIERARCHICAL
+=======================================
+
+K-Means
+
+Fast
+Works well with large datasets
+Requires K beforehand
+
+Hierarchical
+
+No need to specify K initially
+Provides dendrogram visualization
+Slower for large datasets
+
+
+==================================
+9. COMMON EDGE CASES IN CLUSTERING
+==================================
+
+1 Wrong number of clusters
+
+Solution:
+Elbow method or silhouette score.
+
+
+2 Outliers
+
+Outliers distort centroids.
+
+Solution:
+Remove outliers.
+
+
+3 Non-spherical clusters
+
+K-Means assumes spherical clusters.
+
+Solution:
+Use DBSCAN.
+
+
+4 High dimensional data
+
+Distance metrics become unreliable.
+
+Solution:
+Use PCA before clustering.
+
+
+================
+FINAL CONCLUSION
+================
+
+Clustering is an important unsupervised learning technique used to discover hidden structures in data.
+
+Key algorithms:
+
+K-Means → fast and simple
+Hierarchical → tree-based clustering
+
+Both are widely used in:
+
+• customer segmentation
+• recommendation systems
+• pattern discovery

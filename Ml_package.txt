@@ -1,0 +1,425 @@
+## PACKAGES OF MACHINE LEARNING
+
+============================================
+1. INTRODUCTION TO MACHINE LEARNING PACKAGES
+============================================
+Machine Learning projects require libraries for:
+-> Numerical computation
+-> Data manipulation
+-> Data visualization
+-> Statistical analysis
+
+The most widely used Python libraries are:
+1. NumPy → Numerical computing
+2. Pandas → Data manipulation
+3. Matplotlib → Basic visualization
+4. Seaborn → Advanced statistical visualization
+
+These libraries are the foundation of the ML ecosystem.
+
+Typical ML Workflow Using These Libraries
+1 Data collection
+2 Data preprocessing (Pandas)
+3 Numerical operations (NumPy)
+4 Data visualization (Matplotlib / Seaborn)
+5 Model building (Scikit-Learn / TensorFlow / PyTorch)
+
+==============================
+2. NUMPY – NUMERICAL COMPUTING
+==============================
+NumPy stands for Numerical Python.
+It is the fundamental library for:
+-> Mathematical operations
+-> Matrix operations
+-> Scientific computing
+
+
+Key Features of NumPy
+-> Fast numerical computation
+-> Supports multi-dimensional arrays
+-> Efficient memory usage
+-> Vectorized operations
+
+
+Installing NumPy
+pip install numpy
+
+Importing NumPy
+import numpy as np
+
+
+## NUMPY ARRAYS
+---------------
+NumPy provides ndarray (n-dimensional array).
+Example:
+import numpy as np
+arr = np.array([1,2,3,4])
+print(arr)
+
+Output
+[1 2 3 4]
+
+
+Creating Arrays
+arr1 = np.array([1,2,3])
+arr2 = np.zeros(5)
+arr3 = np.ones(5)
+arr4 = np.arange(0,10)
+arr5 = np.linspace(0,1,5)
+
+
+Array Dimensions
+arr = np.array([[1,2],[3,4]])
+print(arr.shape)
+
+Output
+(2,2)
+
+
+===================
+3. ARRAY OPERATIONS
+===================
+NumPy supports vectorized operations.
+
+Example:
+a = np.array([1,2,3])
+b = np.array([4,5,6])
+
+Addition
+a + b
+
+Output
+[5 7 9]
+
+
+Multiplication
+a -> b
+
+Output
+[4 10 18]
+
+
+Scalar operations
+a -> 10
+
+Output
+[10 20 30]
+
+Matrix Multiplication
+np.dot(a,b)
+
+Reshaping Arrays
+
+arr = np.arange(6)
+arr.reshape(2,3)
+
+Stacking Arrays
+np.vstack((a,b))
+np.hstack((a,b))
+
+
+Edge Cases in Array Operations
+1 Shape mismatch
+Arrays must have compatible shapes.
+2 Broadcasting errors
+Improper dimension alignment.
+3 Memory overflow
+Very large arrays may consume RAM.
+
+
+==================================
+4. MATHEMATICAL FUNCTIONS IN NUMPY
+==================================
+NumPy provides many built-in mathematical functions.
+
+Basic Math Functions
+arr = np.array([1,4,9,16])
+np.sqrt(arr)
+
+Output
+[1 2 3 4]
+
+
+Logarithm
+np.log(arr)
+
+Trigonometric Functions
+np.sin(arr)
+np.cos(arr)
+
+Statistical Functions
+arr = np.array([10,20,30,40])
+np.mean(arr)
+np.median(arr)
+np.std(arr)
+np.var(arr)
+
+Finding Maximum / Minimum
+np.max(arr)
+np.min(arr)
+
+Edge Cases
+1 Division by zero
+Produces infinity.
+2 Negative sqrt
+Produces NaN.
+
+=============================
+5. PANDAS – DATA MANIPULATION
+=============================
+Pandas is used for:
+-> Data analysis
+-> Data cleaning
+-> Data transformation
+
+It provides two main structures:
+1 Series (1D data)
+2 DataFrame (2D table)
+
+Installing Pandas
+pip install pandas
+
+Importing Pandas
+import pandas as pd
+
+=============
+6. DATAFRAMES
+=============
+A DataFrame is a tabular data structure similar to Excel.
+Example:
+import pandas as pd
+data = {
+"Name":["Ali","Sara","John"],
+"Age":[23,25,22],
+"City":["Mumbai","Delhi","Pune"]
+}
+
+df = pd.DataFrame(data)
+print(df)
+
+Reading CSV File
+df = pd.read_csv("data.csv")
+
+Basic DataFrame Operations
+--------------------------
+View first rows
+df.head()
+
+View last rows
+df.tail()
+
+Column names
+df.columns
+
+Data types
+df.dtypes
+
+Selecting Columns
+df["Age"]
+
+Multiple columns
+df[["Name","Age"]]
+
+Filtering Data
+df[df["Age"] > 23]
+
+
+==========================
+7. HANDLING MISSING VALUES
+==========================
+Real datasets often contain missing values.
+Example:
+Name   Age    City
+Ali    23     Mumbai
+Haidar NaN    Delhi
+
+Detect missing values
+df.isnull()
+
+Remove missing values
+df.dropna()
+
+Fill missing values
+df.fillna(0)
+
+
+Fill with mean
+df["Age"].fillna(df["Age"].mean())
+
+Edge Cases
+1 Large missing percentage
+Better to drop column.
+2 Wrong imputation
+May bias ML models.
+
+==============================
+8. FILTERING AND GROUPING DATA
+==============================
+Filtering Example
+df[df["Age"] > 24]
+
+Multiple conditions
+df[(df["Age"] > 20) & (df["City"]=="Delhi")]
+
+Grouping Data
+df.groupby("City").mean()
+
+Example Dataset
+
+City   Salary
+Delhi  50000
+Delhi  60000
+Mumbai 70000
+
+Grouping
+--------
+df.groupby("City")["Salary"].mean()
+
+Output
+Delhi → 55000
+Mumbai → 70000
+
+
+==================================
+9. MATPLOTLIB – DATA VISUALIZATION
+==================================
+Matplotlib is the most widely used Python plotting library.
+It is used for:
+-> Line plots
+-> Scatter plots
+-> Histograms
+-> Bar charts
+
+
+"Installing"
+pip install matplotlib
+
+"Import"
+import matplotlib.pyplot as plt
+
+LINE PLOT
+---------
+x = [1,2,3,4]
+y = [10,20,25,30]
+plt.plot(x,y)
+plt.show()
+
+SCATTER PLOT
+------------
+plt.scatter(x,y)
+
+BAR CHART
+---------
+plt.bar(["A","B","C"],[10,20,15])
+
+HISTOGRAM
+---------
+data = [10,20,20,30,30,30]
+plt.hist(data)
+
+Edge Cases
+1 Too many categories
+Charts become unreadable.
+2 Outliers
+Can distort visualization.
+
+
+=======================================
+10. SEABORN – STATISTICAL VISUALIZATION
+=======================================
+Seaborn is built on top of Matplotlib.
+It provides more advanced statistical plots.
+
+"Installing"
+pip install seaborn
+
+"Import"
+import seaborn as sns
+
+Example Dataset
+tips = sns.load_dataset("tips")
+
+============
+11. HEATMAPS
+============
+Heatmaps show correlation between variables.
+Example
+corr = tips.corr()
+sns.heatmap(corr)
+
+Use Case
+--------
+Detect feature relationships in ML datasets.
+
+==============
+12. PAIR PLOTS
+==============
+
+Pairplot shows relationships between multiple variables.
+Example
+sns.pairplot(tips)
+It displays:
+-> Scatter plots between variables
+-> Histograms for each variable
+
+Use Case
+--------
+Exploratory Data Analysis (EDA)
+
+=====================
+13. CATEGORICAL PLOTS
+=====================
+Used for categorical variables.
+Example
+sns.barplot(x="day", y="total_bill", data=tips)
+
+Other categorical plots
+
+countplot
+---------
+sns.countplot(x="day", data=tips)
+
+boxplot
+-------
+sns.boxplot(x="day", y="total_bill", data=tips)
+
+Edge Cases
+----------
+1 Large dataset → slow rendering
+2 Too many categories → cluttered chart
+
+
+===================================================
+14. COMPLETE MACHINE LEARNING DATA ANALYSIS EXAMPLE
+===================================================
+Example using Pandas + Seaborn.
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = sns.load_dataset("titanic")
+print(df.head())
+
+Handle missing values
+------------------df["age"].fillna(df["age"].mean(), inplace=True)
+
+Visualization
+----------sns.countplot(x="survived", data=df)
+plt.show()
+
+
+=============
+FINAL SUMMARY
+=============
+NumPy
+Used for numerical computation and array operations.
+
+Pandas
+Used for data manipulation and cleaning.
+
+Matplotlib
+Used for basic plotting and visualization.
+
+Seaborn
+Used for advanced statistical visualization.
